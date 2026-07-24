@@ -29,20 +29,21 @@ jobs:
         with:
           channel: 'stable'
 
-      - name: Instalar dependencias del proyecto
+      - name: Instalar dependencias de Flutter
         run: flutter pub get
 
-      - name: Limpiar e Instalar dependencias de CocoaPods y SPM
+      - name: Preparar entorno nativo de iOS
         run: |
           cd ios
-          pod deintegrate
-          rm -rf Pods Podfile.lock .symlinks Flutter/Flutter.podspec
-          # Forzar a Xcode a limpiar cachés antiguos de Swift Package Manager
-          rm -rf ~/Library/Caches/org.swift.swiftpm
-          rm -rf ~/Library/Developer/Xcode/DerivedData
           pod repo update
           pod install
 
       - name: Compilar App para iOS
-        # Se añade la bandera para resolver SPM usando el nuevo entorno Xcode 16
-        run: flutter build ios --release --no-codesign --pub
+        # Quitamos la limpieza agresiva y dejamos que Flutter gestione la creación de carpetas automáticamente
+        run: flutter build ios --release --no-codesign
+        
+      - name: Subir el resultado de la compilación
+        uses: actions/upload-artifact@v4
+        with:
+          name: App-iOS-Build
+          path: build/ios/iphoneos
