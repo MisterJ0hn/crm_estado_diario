@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "194527523170",
+    "project_id": "crm-estado-diario",
+    "storage_bucket": "crm-estado-diario.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:194527523170:android:4fcd9eb39e95dce6683c3b",
+        "android_client_info": {
+          "package_name": "com.example.crm_app_movil"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCe1FoWQ414U3KUuSIUcC_MCtK35sd-5tA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

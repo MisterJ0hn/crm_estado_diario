@@ -1,0 +1,44 @@
+name: Compilar Flutter iOS
+
+on:
+  push:
+    branches:
+      - main # Cambia esto si tu rama principal se llama master o de otra forma
+
+jobs:
+  build:
+    runs-on: macos-14 # Usa las máquinas Mac oficiales de GitHub
+    
+    steps:
+      - name: Descargar el código del repositorio
+        uses: actions/checkout@v4
+
+      - name: Configurar Java (Requerido por algunas dependencias de Flutter)
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+
+      - name: Configurar Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          # flutter-version: '3.19.0' # Opcional: Descomenta si necesitas una versión fija
+
+      - name: Instalar dependencias del proyecto
+        run: flutter pub get
+
+      - name: Instalar dependencias de CocoaPods (iOS)
+        run: |
+          cd ios
+          pod install
+
+      - name: Compilar App para iOS
+        # El parámetro --no-codesign permite compilar sin tener que subir certificados de Apple a GitHub
+        run: flutter build ios --release --no-codesign
+
+      - name: Subir el resultado de la compilación
+        uses: actions/upload-artifact@v4
+        with:
+          name: App-iOS-Build
+          path: build/ios/iphoneos
