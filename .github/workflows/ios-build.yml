@@ -13,10 +13,12 @@ jobs:
       - name: Descargar el código del repositorio
         uses: actions/checkout@v4
 
-      - name: Seleccionar versión de Xcode (Xcode 16.1)
-        run: |
-          sudo xcode-select -s /Applications/Xcode_16.1.app/Contents/Developer
-          xcodebuild -version
+      - name: Seleccionar Xcode más reciente disponible
+        # firebase-ios-sdk >= 12.0.0 requiere Swift tools 6.1, que exige Xcode 16.3+.
+        # Usamos "latest-stable" en vez de fijar una versión para no quedar cortos otra vez.
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: latest-stable
 
       - name: Configurar Java
         uses: actions/setup-java@v4
@@ -29,19 +31,19 @@ jobs:
         with:
           channel: 'stable'
 
+      - name: Workaround para bug de Flutter con Swift Package Manager
+        # flutter pub get intenta copiar los paquetes SPM de plugins (ej. firebase_messaging)
+        # a build/ios/SourcePackages, pero falla si esa carpeta no existe en un checkout limpio.
+        run: mkdir -p build/ios/SourcePackages
+
       - name: Instalar dependencias de Flutter
         run: flutter pub get
 
-      - name: Preparar entorno nativo de iOS
-        run: |
-          cd ios
-          pod repo update
-          pod install
-
       - name: Compilar App para iOS
-        # Quitamos la limpieza agresiva y dejamos que Flutter gestione la creación de carpetas automáticamente
+        # Este proyecto no tiene Podfile: usa Swift Package Manager, no CocoaPods,
+        # así que no hace falta (ni funciona) un paso de "pod install".
         run: flutter build ios --release --no-codesign
-        
+
       - name: Subir el resultado de la compilación
         uses: actions/upload-artifact@v4
         with:
