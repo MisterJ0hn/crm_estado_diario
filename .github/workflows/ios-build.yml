@@ -25,13 +25,14 @@ jobs:
           channel: 'stable'
           # flutter-version: '3.19.0' # Opcional: Descomenta si necesitas una versión fija
 
+      - name: Workaround para bug de Flutter con Swift Package Manager
+        # `flutter pub get` intenta copiar los paquetes SPM de los plugins (ej. firebase_messaging)
+        # a build/ios/SourcePackages, pero falla si esa carpeta no existe aún en un checkout limpio.
+        # Ver: https://github.com/flutter/flutter/issues/162072 y relacionados.
+        run: mkdir -p build/ios/SourcePackages
+
       - name: Instalar dependencias del proyecto
         run: flutter pub get
-
-      - name: Instalar dependencias de CocoaPods (iOS)
-        run: |
-          cd ios
-          pod install
 
       - name: Compilar App para iOS
         # El parámetro --no-codesign permite compilar sin tener que subir certificados de Apple a GitHub
